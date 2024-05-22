@@ -14,7 +14,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Column(
         children: [
-          SizedBox()
+          SizedBox(child: Container(color: Colors.red, width: 70, height: 70,),)
         ],
 
       ),
