@@ -41,10 +41,10 @@ class _NavigationMenuState extends State<NavigationMenu> {
         ],
       ),
       body: <Widget>[
-        HomePage(),
        Container(
          color: Colors.blueAccent,
        ),
+        HomePage(),
         Container(
           color: Colors.yellow,
         ),
