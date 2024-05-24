@@ -8,16 +8,27 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   double _fillLevel = 0.0; // Niveau de remplissage initial
   double _maxValue = 3000.0; // Valeur maximale du remplissage
-  double _incrementValue = 400.0; // Valeur d'incrémentation initiale
+  double _incrementValue = 300.0; // Valeur d'incrémentation initiale
+  double _lastIncrementValue = 0.0; // Dernière valeur ajoutées
 
   final TextEditingController _maxValueController = TextEditingController();
   final TextEditingController _incrementValueController = TextEditingController();
 
   void _incrementFillLevel() {
     setState(() {
-      _fillLevel += _incrementValue / _maxValue; // Ajoute la quantité spécifiée au remplissage
+      _lastIncrementValue = _incrementValue / _maxValue; // Garde une trace de la dernière valeur ajoutée
+      _fillLevel += _lastIncrementValue; // Ajoute la quantité spécifiée au remplissage
       if (_fillLevel > 1.0) {
         _fillLevel = 1.0; // Limite le niveau de remplissage à 100%
+      }
+    });
+  }
+
+  void _decrementFillLevel() {
+    setState(() {
+      _fillLevel -= _lastIncrementValue; // Retire la dernière quantité ajoutée
+      if (_fillLevel < 0.0) {
+        _fillLevel = 0.0; // Limite le niveau de remplissage à 0%
       }
     });
   }
@@ -48,7 +59,6 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -56,6 +66,7 @@ class _HomePageState extends State<HomePage> {
                 '${(_fillLevel * 100).toStringAsFixed(0)}%',
                 style: TextStyle(fontSize: 50),
               ),
+              SizedBox(height: 20),
               Stack(
                 alignment: Alignment.center, // Centrer les éléments dans le Stack
                 children: [
@@ -80,12 +91,28 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(shape: CircleBorder(),
-                padding: EdgeInsets.all(20)),
-                onPressed: _incrementFillLevel,
-                child: Icon(Icons.add),
+              SizedBox(height: 180),
+              Row(
+                children: [
+                      SizedBox(width: 174,),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: CircleBorder(),
+                        padding: EdgeInsets.all(20),
+                      ),
+                      onPressed: _incrementFillLevel,
+                      child: Icon(Icons.add),
+                    ),
+                    SizedBox(width: 90,),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: CircleBorder(),
+                        padding: EdgeInsets.all(15),
+                      ),
+                      onPressed: _decrementFillLevel,
+                      child: Icon(Icons.remove),
+                    ),
+                ],
               ),
             ],
           ),
