@@ -6,43 +6,43 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  double _fillLevel = 0.0; // Niveau de remplissage initial
-  double _maxValue = 3000.0; // Valeur maximale du remplissage
-  double _incrementValue = 300.0; // Valeur d'incrémentation initiale
-  double _lastIncrementValue = 0.0; // Dernière valeur ajoutées
+  double _fillLevel = 0.0;
+  double _maxValue = 3000.0;
+  double _incrementValue = 300.0;
+  double _lastIncrementValue = 0.0;
 
   final TextEditingController _maxValueController = TextEditingController();
   final TextEditingController _incrementValueController = TextEditingController();
 
   void _incrementFillLevel() {
     setState(() {
-      _lastIncrementValue = _incrementValue / _maxValue; // Garde une trace de la dernière valeur ajoutée
-      _fillLevel += _lastIncrementValue; // Ajoute la quantité spécifiée au remplissage
+      _lastIncrementValue = _incrementValue / _maxValue;
+      _fillLevel += _lastIncrementValue;
       if (_fillLevel > 1.0) {
-        _fillLevel = 1.0; // Limite le niveau de remplissage à 100%
+        _fillLevel = 1.0;
       }
     });
   }
 
   void _decrementFillLevel() {
     setState(() {
-      _fillLevel -= _lastIncrementValue; // Retire la dernière quantité ajoutée
+      _fillLevel -= _lastIncrementValue;
       if (_fillLevel < 0.0) {
-        _fillLevel = 0.0; // Limite le niveau de remplissage à 0%
+        _fillLevel = 0.0;
       }
     });
   }
 
   void _setMaxValue() {
     setState(() {
-      _maxValue = double.tryParse(_maxValueController.text) ?? 100.0; // Met à jour la valeur maximale
-      _fillLevel = 0.0; // Réinitialise le niveau de remplissage
+      _maxValue = double.tryParse(_maxValueController.text) ?? 100.0;
+      _fillLevel = 0.0;
     });
   }
 
   void _setIncrementValue() {
     setState(() {
-      _incrementValue = double.tryParse(_incrementValueController.text) ?? 10.0; // Met à jour la valeur d'incrémentation
+      _incrementValue = double.tryParse(_incrementValueController.text) ?? 10.0;
     });
   }
 
