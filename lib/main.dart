@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:waterreminderapp/navigation_menu.dart';
-import 'package:waterreminderapp/pages/home_page.dart';
+import 'package:provider/provider.dart';
 import 'package:waterreminderapp/pages/spalsh_screen.dart';
-
-
+import 'package:waterreminderapp/pages/setting_model.dart';
 void main() => runApp(const NavigationBarApp());
 
 class NavigationBarApp extends StatelessWidget {
@@ -11,9 +9,12 @@ class NavigationBarApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(useMaterial3: true),
-      home: SplashScreen(),
+    return ChangeNotifierProvider(
+      create: (context) => SettingsModel(),
+      child: MaterialApp(
+        theme: ThemeData(useMaterial3: true),
+        home: SplashScreen(),
+      ),
     );
   }
 }

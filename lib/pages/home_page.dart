@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:waterreminderapp/pages/setting_model.dart';
+import 'package:waterreminderapp/pages/page_parametres.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -6,48 +9,33 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  double _fillLevel = 0.0;
-  double _maxValue = 3000.0;
-  double _incrementValue = 300.0;
   double _lastIncrementValue = 0.0;
 
-  final TextEditingController _maxValueController = TextEditingController();
-  final TextEditingController _incrementValueController = TextEditingController();
-
-  void _incrementFillLevel() {
+  void _incrementFillLevel(double incrementValue, double maxValue, SettingsModel settings) {
     setState(() {
-      _lastIncrementValue = _incrementValue / _maxValue;
-      _fillLevel += _lastIncrementValue;
-      if (_fillLevel > 1.0) {
-        _fillLevel = 1.0;
+      _lastIncrementValue = incrementValue / maxValue;
+      double newFillLevel = settings.fillLevel + _lastIncrementValue;
+      if (newFillLevel > 1.0) {
+        newFillLevel = 1.0;
       }
+      settings.setFillLevel(newFillLevel); // Save the new fill level in the global state
     });
   }
 
-  void _decrementFillLevel() {
+  void _decrementFillLevel(SettingsModel settings) {
     setState(() {
-      _fillLevel -= _lastIncrementValue;
-      if (_fillLevel < 0.0) {
-        _fillLevel = 0.0;
+      double newFillLevel = settings.fillLevel - _lastIncrementValue;
+      if (newFillLevel < 0.0) {
+        newFillLevel = 0.0;
       }
-    });
-  }
-
-  void _setMaxValue() {
-    setState(() {
-      _maxValue = double.tryParse(_maxValueController.text) ?? 100.0;
-      _fillLevel = 0.0;
-    });
-  }
-
-  void _setIncrementValue() {
-    setState(() {
-      _incrementValue = double.tryParse(_incrementValueController.text) ?? 10.0;
+      settings.setFillLevel(newFillLevel);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<SettingsModel>(context);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -63,12 +51,16 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '${(_fillLevel * 100).toStringAsFixed(0)}%',
+                '${(settings.fillLevel * 100).toStringAsFixed(0)}%',
+                style: TextStyle(fontSize: 50),
+              ),
+              Text(
+                '${settings.objectifQuotidien}',
                 style: TextStyle(fontSize: 50),
               ),
               SizedBox(height: 20),
               Stack(
-                alignment: Alignment.center, // Centrer les éléments dans le Stack
+                alignment: Alignment.center,
                 children: [
                   Container(
                     width: 150.0,
@@ -79,7 +71,7 @@ class _HomePageState extends State<HomePage> {
                     bottom: 0,
                     child: Container(
                       width: 150.0,
-                      height: 200.0 * _fillLevel,
+                      height: 200.0 * settings.fillLevel,
                       color: Colors.blue,
                     ),
                   ),
@@ -93,25 +85,25 @@ class _HomePageState extends State<HomePage> {
               ),
               SizedBox(height: 180),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                      SizedBox(width: 174,),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(20),
-                      ),
-                      onPressed: _incrementFillLevel,
-                      child: Icon(Icons.add),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: CircleBorder(),
+                      padding: EdgeInsets.all(20),
                     ),
-                    SizedBox(width: 90,),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(15),
-                      ),
-                      onPressed: _decrementFillLevel,
-                      child: Icon(Icons.remove),
+                    onPressed: () => _incrementFillLevel(settings.quantiteAAjouter, settings.objectifQuotidien, settings),
+                    child: Icon(Icons.add),
+                  ),
+                  SizedBox(width: 90),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: CircleBorder(),
+                      padding: EdgeInsets.all(15),
                     ),
+                    onPressed: () => _decrementFillLevel(settings),
+                    child: Icon(Icons.remove),
+                  ),
                 ],
               ),
             ],
@@ -121,4 +113,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
