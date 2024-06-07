@@ -8,23 +8,45 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  double _lastIncrementValue = 0.0;
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // Load settings on app start
+    Provider.of<SettingsModel>(context, listen: false).loadSettings();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      final settings = Provider.of<SettingsModel>(context, listen: false);
+      settings.setFillLevel(settings.fillLevel);  // This will trigger saving the data
+      settings.setLastIncrementValue(settings.lastIncrementValue);  // Save the last increment value
+    }
+  }
 
   void _incrementFillLevel(double incrementValue, double maxValue, SettingsModel settings) {
     setState(() {
-      _lastIncrementValue = incrementValue / maxValue;
-      double newFillLevel = settings.fillLevel + _lastIncrementValue;
+      double lastIncrementValue = incrementValue / maxValue;
+      settings.setLastIncrementValue(lastIncrementValue);
+      double newFillLevel = settings.fillLevel + lastIncrementValue;
       if (newFillLevel > 1.0) {
         newFillLevel = 1.0;
       }
-      settings.setFillLevel(newFillLevel); // Save the new fill level in the global state
+      settings.setFillLevel(newFillLevel);
     });
   }
 
   void _decrementFillLevel(SettingsModel settings) {
     setState(() {
-      double newFillLevel = settings.fillLevel - _lastIncrementValue;
+      double newFillLevel = settings.fillLevel - settings.lastIncrementValue;
       if (newFillLevel < 0.0) {
         newFillLevel = 0.0;
       }
