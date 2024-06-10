@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:waterreminderapp/pages/setting_model.dart';
-import 'package:waterreminderapp/pages/page_parametres.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -27,30 +26,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
       final settings = Provider.of<SettingsModel>(context, listen: false);
-      settings.setFillLevel(settings.fillLevel);  // This will trigger saving the data
       settings.setLastIncrementValue(settings.lastIncrementValue);  // Save the last increment value
+      settings.setEauQuotidienne(settings.eauQuotidienne);  // Save the daily water consumption
     }
   }
 
-  void _incrementFillLevel(double incrementValue, double maxValue, SettingsModel settings) {
+  void _incrementEauQuotidienne(double incrementValue, double maxValue, SettingsModel settings) {
     setState(() {
-      double lastIncrementValue = incrementValue / maxValue;
+      double lastIncrementValue = incrementValue ;
       settings.setLastIncrementValue(lastIncrementValue);
-      double newFillLevel = settings.fillLevel + lastIncrementValue;
-      if (newFillLevel > 1.0) {
-        newFillLevel = 1.0;
+      double newEauQuotidienne = settings.eauQuotidienne + lastIncrementValue;
+      if (newEauQuotidienne > settings.objectifQuotidien) {
+        newEauQuotidienne = settings.objectifQuotidien;
       }
-      settings.setFillLevel(newFillLevel);
+      settings.setEauQuotidienne(newEauQuotidienne);
     });
   }
 
-  void _decrementFillLevel(SettingsModel settings) {
+  void _decrementEauQuotidienne(SettingsModel settings) {
     setState(() {
-      double newFillLevel = settings.fillLevel - settings.lastIncrementValue;
-      if (newFillLevel < 0.0) {
-        newFillLevel = 0.0;
+      double newEauQuotidienne = settings.eauQuotidienne - settings.lastIncrementValue;
+      if (newEauQuotidienne < 0.0) {
+        newEauQuotidienne = 0.0;
       }
-      settings.setFillLevel(newFillLevel);
+      settings.setEauQuotidienne(newEauQuotidienne);
     });
   }
 
@@ -73,12 +72,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '${(settings.fillLevel * 100).toStringAsFixed(0)}%',
+                '${((settings.eauQuotidienne / settings.objectifQuotidien) * 100).toStringAsFixed(0)}%',
                 style: TextStyle(fontSize: 50),
               ),
               Text(
-                '${settings.objectifQuotidien}',
+                '${settings.objectifQuotidien.toStringAsFixed(0)}',
                 style: TextStyle(fontSize: 50),
+              ),
+              Text(
+                'Eau quotidienne : ${settings.eauQuotidienne}', // Afficher la quantité d'eau quotidienne
+                style: TextStyle(fontSize: 20),
               ),
               SizedBox(height: 20),
               Stack(
@@ -93,7 +96,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     bottom: 0,
                     child: Container(
                       width: 150.0,
-                      height: 200.0 * settings.fillLevel,
+                      height: 200.0 * (settings.eauQuotidienne / settings.objectifQuotidien),
                       color: Colors.blue,
                     ),
                   ),
@@ -114,7 +117,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       shape: CircleBorder(),
                       padding: EdgeInsets.all(20),
                     ),
-                    onPressed: () => _incrementFillLevel(settings.quantiteAAjouter, settings.objectifQuotidien, settings),
+                    onPressed: () => _incrementEauQuotidienne(settings.quantiteAAjouter, settings.objectifQuotidien, settings),
                     child: Icon(Icons.add),
                   ),
                   SizedBox(width: 90),
@@ -123,7 +126,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       shape: CircleBorder(),
                       padding: EdgeInsets.all(15),
                     ),
-                    onPressed: () => _decrementFillLevel(settings),
+                    onPressed: () => _decrementEauQuotidienne(settings),
                     child: Icon(Icons.remove),
                   ),
                 ],

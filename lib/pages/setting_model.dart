@@ -1,16 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Ajoutez cette ligne pour importer intl
 
 class SettingsModel extends ChangeNotifier {
   double _objectifQuotidien = 3000.0;
   double _quantiteAAjouter = 300.0;
-  double _fillLevel = 0.0;
   double _lastIncrementValue = 0.0;
+  double _eauQuotidienne = 0.0; // Nouvelle variable pour stocker la quantité d'eau quotidienne
 
   double get objectifQuotidien => _objectifQuotidien;
   double get quantiteAAjouter => _quantiteAAjouter;
-  double get fillLevel => _fillLevel;
   double get lastIncrementValue => _lastIncrementValue;
+  double get eauQuotidienne => _eauQuotidienne; // Getter pour la quantité d'eau quotidienne
 
   // Initialize Firestore instance
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -32,16 +33,16 @@ class SettingsModel extends ChangeNotifier {
     _saveSettings();
   }
 
-  void setFillLevel(double value) {
-    _fillLevel = value;
-    notifyListeners();
-    _saveFillLevel();
-  }
-
   void setLastIncrementValue(double value) {
     _lastIncrementValue = value;
     notifyListeners();
     _saveLastIncrementValue();
+  }
+
+  void setEauQuotidienne(double value) { // Ajout de la fonction setEauQuotidienne
+    _eauQuotidienne = value;
+    notifyListeners();
+    _saveEauQuotidienne();
   }
 
   Future<void> _saveSettings() async {
@@ -51,18 +52,18 @@ class SettingsModel extends ChangeNotifier {
     });
   }
 
-  Future<void> _saveFillLevel() async {
-    DateTime now = DateTime.now();
-    String formattedDate = "${now.year}-${now.month}-${now.day}";
-    await _firestore.collection('Water').doc(formattedDate).set({
-      'fillLevel': _fillLevel,
-      'date': formattedDate,
-    }, SetOptions(merge: true));
-  }
-
   Future<void> _saveLastIncrementValue() async {
     await _firestore.collection('Settings').doc('currentSettings').update({
       'lastIncrementValue': _lastIncrementValue,
+    });
+  }
+
+  Future<void> _saveEauQuotidienne() async { // Sauvegarder eauQuotidienne dans Firestore
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyy-MM-dd').format(now); // Formatage de la date
+    await _firestore.collection('Water').doc(formattedDate).set({
+      'date': now, // Stocker la date
+      'eauQuotidienne': _eauQuotidienne,
     });
   }
 
@@ -75,11 +76,16 @@ class SettingsModel extends ChangeNotifier {
       notifyListeners();
     }
 
+    // Chargement de la quantité d'eau quotidienne
+    _loadEauQuotidienne();
+  }
+
+  Future<void> _loadEauQuotidienne() async {
     DateTime now = DateTime.now();
-    String formattedDate = "${now.year}-${now.month}-${now.day}";
+    String formattedDate = DateFormat('yyyy-MM-dd').format(now); // Formatage de la date
     DocumentSnapshot waterDoc = await _firestore.collection('Water').doc(formattedDate).get();
     if (waterDoc.exists) {
-      _fillLevel = waterDoc['fillLevel'];
+      _eauQuotidienne = waterDoc['eauQuotidienne'];
       notifyListeners();
     }
   }

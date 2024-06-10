@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:waterreminderapp/pages/home_page.dart';
+import 'package:waterreminderapp/pages/page_historique.dart';
 import 'package:waterreminderapp/pages/page_parametres.dart';
 
 class NavigationMenu extends StatefulWidget {
@@ -42,11 +43,9 @@ class _NavigationMenuState extends State<NavigationMenu> {
         ],
       ),
       body: <Widget>[
-       Container(
-         color: Colors.blueAccent,
-       ),
+        PageHistorique(),
         HomePage(),
-        PageParametres()
+        PageParametres(),
       ][currentPageIndex],
     );
   }
