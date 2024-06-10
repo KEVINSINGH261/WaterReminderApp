@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "465278059859",
+    "project_id": "waterreminderappislandgroup",
+    "storage_bucket": "waterreminderappislandgroup.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465278059859:android:4bd3ddc0041bab027e4da6",
+        "android_client_info": {
+          "package_name": "com.waterreminderapp.waterreminderapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfuyQkEl2XwugGbipbNP7fXcN9dLc57QM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
