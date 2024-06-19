@@ -13,6 +13,7 @@ class PageParametres extends StatefulWidget {
 class _PageParametresState extends State<PageParametres> {
   final TextEditingController _objectifController = TextEditingController();
   final TextEditingController _quantiteController = TextEditingController();
+  final TextEditingController _intervalleNotif = TextEditingController();
 
   @override
   void initState() {
@@ -20,6 +21,7 @@ class _PageParametresState extends State<PageParametres> {
     final settings = Provider.of<SettingsModel>(context, listen: false);
     _objectifController.text = settings.objectifQuotidien.toString();
     _quantiteController.text = settings.quantiteAAjouter.toString();
+    _intervalleNotif.text = settings.intervalleNotif.toString();
   }
 
   @override
@@ -161,6 +163,78 @@ class _PageParametresState extends State<PageParametres> {
               ],
             ),
             Divider(height: 20, thickness: 1,),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Autoriser les notifications", style: TextStyle(fontSize: 15,)),
+                  Switch(
+                    trackOutlineColor: const MaterialStatePropertyAll<Color>(Colors.black),
+                    thumbColor: const MaterialStatePropertyAll<Color>(Colors.white),
+                    trackColor:  const MaterialStatePropertyAll<Color>(Colors.blue),
+                    value: settings.notificationsEnabled,
+                    onChanged: (bool value) {
+                      settings.setNotificationsEnabled(value);
+                    },
+                  )
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                _intervalleNotif.text = settings.intervalleNotif.toString();
+                showDialog(context: context, builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text("Entrer la frequence (en heures) a laquel vous voulez recevoir des notifications"),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: _intervalleNotif,
+                          decoration: InputDecoration(
+                              labelText: "Frequence (heures)"
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            int? newValue = int.tryParse(_intervalleNotif.text);
+                            if (newValue != null) {
+                              settings.setIntervalleNotif(newValue);
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          child: Text("Enregistrer")
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Annuler")
+                      ),
+                    ],
+                  );
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Objectif quotidien", style: TextStyle(fontSize: 15,)),
+                    Text('toute les ${settings.intervalleNotif} h'),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
